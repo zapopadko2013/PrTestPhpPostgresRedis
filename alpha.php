@@ -4,9 +4,23 @@ set_time_limit(0);
 
 $config = require __DIR__ . '/config.php';
 
-// Подключение к Redis
+// Получаем переменные окружения, которые предоставляет Railway
+$redis_url = getenv('REDIS_URL');
+
+// Разбираем URL для получения хоста, порта и пароля
+$redis_host = parse_url($redis_url, PHP_URL_HOST);
+$redis_port = parse_url($redis_url, PHP_URL_PORT);
+$redis_pass = parse_url($redis_url, PHP_URL_PASS);
+
 $redis = new Redis();
-$redis->connect($config['redis']['host'], $config['redis']['port']);
+
+// Подключаемся к хосту и порту
+$redis->connect($redis_host, $redis_port);
+
+// Проверяем, есть ли пароль, и если есть, аутентифицируемся
+if ($redis_pass) {
+    $redis->auth($redis_pass);
+}
 
 // Проверка блокировки
  if ($redis->get('alpha_running')) {

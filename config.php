@@ -1,13 +1,13 @@
 <?php
 return [
     'db' => [
-        'host' => 'postgres.railway.internal',
-        'dbname' => 'railway',
-        'user' => 'postgres',
-        'password' => 'ZFdzFouKdUYjnnPCbvCFyxtyZxnNtEcQ'
+        'host' => getenv('PGHOST'),
+        'dbname' => getenv('PGDATABASE'),
+        'user' => getenv('PGUSER'),
+        'password' => getenv('PGPASSWORD')
     ],
     'redis' => [
-        'host' => 'redis.railway.internal',
-        'port' => 6379
+        'host' => getenv('REDIS_HOST'),
+        'port' => getenv('REDIS_PORT')
     ]
 ];
