@@ -1,13 +1,13 @@
 <?php
 return [
     'db' => [
-        'host' => 'localhost',
-        'dbname' => 'users',
+        'host' => 'postgres.railway.internal',
+        'dbname' => 'railway',
         'user' => 'postgres',
-        'password' => '1'
+        'password' => 'ZFdzFouKdUYjnnPCbvCFyxtyZxnNtEcQ'
     ],
     'redis' => [
-        'host' => 'localhost',
+        'host' => 'redis.railway.internal',
         'port' => 6379
     ]
 ];
