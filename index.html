@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Клиент</title>
+<style>body{font-family:Arial;padding:20px;}</style>
+</head>
+<body>
+<h1>Запуск заказов</h1>
+<label>Количество запусков:</label>
+<input type="number" id="count" value="1000">
+<button id="start">Запустить</button>
+<h2>Статистика</h2>
+<pre id="stats">Здесь будет статистика...</pre>
+<script>
+document.getElementById('start').onclick = () => {
+    const n = document.getElementById('count').value;
+    fetch(`beta.php?n=${n}`);
+};
+setInterval(() => {
+    fetch('gamma.php')
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('stats').textContent = JSON.stringify(data, null, 2);
+        });
+}, 1000);
+</script>
+</body>
+</html>
