@@ -1,13 +1,20 @@
 <?php
+$dbUrl = getenv('DATABASE_URL');
+$redisUrl = getenv('REDIS_URL');
+$dbParts = parse_url($dbUrl);
+$redisParts = parse_url($redisUrl);
+
 return [
     'db' => [
-        'host' => getenv('PGHOST'),
-        'dbname' => getenv('PGDATABASE'),
-        'user' => getenv('PGUSER'),
-        'password' => getenv('PGPASSWORD')
+        'host'     => $dbParts['host'],
+        'dbname'   => trim($dbParts['path'], '/'),
+        'user'     => $dbParts['user'],
+        'password' => $dbParts['pass'],
+        'port'     => $dbParts['port']
     ],
     'redis' => [
-        'host' => getenv('REDIS_HOST'),
-        'port' => getenv('REDIS_PORT')
+        'host' => $redisParts['host'],
+        'port' => $redisParts['port'],
+        'pass' => $redisParts['pass']
     ]
 ];
