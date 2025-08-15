@@ -1,5 +1,5 @@
 {
-    "name": "zapopadko2013/PrTestPhpPostgresRedis",
+    "name": "your-username/your-project-name",
     "description": "A simple PHP project with PostgreSQL and Redis.",
     "type": "project",
     "require": {
