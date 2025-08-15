@@ -1,7 +1,5 @@
 <?php
 
-////
-
 $config = require __DIR__ . '/config.php';
 
 // Функция проверки, есть ли обе таблицы
@@ -26,41 +24,31 @@ try {
         $config['db']['user'],
         $config['db']['password']
     );
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Проверка наличия таблиц
     if (!dbHasTables($pdo, ['categories', 'products'])) {
         echo "Таблицы не найдены, выполняем init_db.sql...\n";
 
-        $cmd = sprintf(
-            'psql -h %s -U %s -d %s -f %s',
-            escapeshellarg($config['db']['host']),
-            escapeshellarg($config['db']['user']),
-            escapeshellarg($config['db']['dbname']),
-            escapeshellarg(__DIR__ . '/init_db.sql')
-        );
+        $sql = file_get_contents(__DIR__ . '/init_db.sql');
+        $pdo->exec($sql);
 
-        putenv("PGPASSWORD={$config['db']['password']}");
-
-        system($cmd, $retval);
-
-        if ($retval === 0) {
-            echo "init_db.sql успешно выполнен.\n";
-        } else {
-            echo "Ошибка выполнения init_db.sql.\n";
-        }
+        echo "init_db.sql успешно выполнен.\n";
     } else {
         echo "База уже инициализирована, таблицы существуют.\n";
     }
 
 } catch (PDOException $e) {
-    echo "Ошибка подключения к базе: " . $e->getMessage() . "\n";
+    echo "Ошибка подключения или инициализации БД: " . $e->getMessage() . PHP_EOL;
+    exit(1);
 }
-///////
 
+// Параметр n
 $n = isset($_GET['n']) ? intval($_GET['n']) : 10;
 
+// Запускаем alpha.php n раз
 for ($i = 0; $i < $n; $i++) {
-     include __DIR__ . '/alpha.php';
+    include __DIR__ . '/alpha.php';
 }
 
 echo "Запущено $n заказов.\n";
