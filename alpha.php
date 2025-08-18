@@ -3,7 +3,7 @@
 set_time_limit(0);
 
 // --- 1. Настройка и подключение к Redis ---
-$redis_url = getenv('REDIS_URL');
+$redis_url = getenv('REDIS_URL') ?: 'redis://default:VpmXkCxeLayffLqOYkxKJQzvSJRjlEjR@shinkansen.proxy.rlwy.net:23157';
 
 if (empty($redis_url)) {
     http_response_code(500);
@@ -33,10 +33,14 @@ if ($redis->get('alpha_running')) {
     exit;
 }
 
-$redis->setex('alpha_running', 5, 1); // Устанавливаем блокировку с таймаутом
+//$redis->setex('alpha_running', 5, 1); // Устанавливаем блокировку с таймаутом
+$redis->set('alpha_running', 1); 
+
+$random_pr = random_int(1, 5);
+$random_count = random_int(1, 20);
 
 // --- 3. Настройка и подключение к PostgreSQL ---
-$db_url = getenv('DATABASE_URL');
+$db_url = getenv('DATABASE_URL') ?: 'postgresql://postgres:ZFdzFouKdUYjnnPCbvCFyxtyZxnNtEcQ@postgres.railway.internal:5432/railway';
 
 if (empty($db_url)) {
     http_response_code(500);
@@ -68,8 +72,8 @@ try {
 // --- 4. Обработка запроса ---
 try {
     // Безопасная обработка входных данных
-    $product_id = filter_input(INPUT_POST, 'product_id', FILTER_VALIDATE_INT) ?: 1;
-    $quantity   = filter_input(INPUT_POST, 'quantity', FILTER_VALIDATE_INT) ?: 1;
+    $product_id = filter_input(INPUT_POST, 'product_id', FILTER_VALIDATE_INT) ?: $random_pr;
+    $quantity   = filter_input(INPUT_POST, 'quantity', FILTER_VALIDATE_INT) ?: $random_count;
 
     $stmt = $db->prepare("INSERT INTO orders (product_id, quantity) VALUES (:product_id, :quantity)");
 

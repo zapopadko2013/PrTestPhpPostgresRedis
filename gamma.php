@@ -1,46 +1,71 @@
 <?php
 $config = require __DIR__ . '/config.php';
+require __DIR__ . '/db_utils.php';
 
 try {
-    $db = new PDO(
-        "pgsql:host={$config['db']['host']};dbname={$config['db']['dbname']}",
-        $config['db']['user'],
-        $config['db']['password'],
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
 
-    // Получаем последние 100 заказов с непустыми датами
-    $sql = "SELECT created_at 
-            FROM orders
-            WHERE created_at IS NOT NULL
-            ORDER BY created_at DESC
-            LIMIT 100";
-
-    $rows = $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-
-    $timestamps = [];
-    foreach ($rows as $row) {
-        if (!empty($row['created_at'])) {
-            $timestamps[] = strtotime($row['created_at']);
-        }
+    $db_url = getenv('DATABASE_URL') ?: 'postgresql://postgres:ZFdzFouKdUYjnnPCbvCFyxtyZxnNtEcQ@postgres.railway.internal:5432/railway';
+    if ($db_url === false) {
+        die("Ошибка: переменная окружения DATABASE_URL не найдена\n");
     }
 
-    if (empty($timestamps)) {
-        echo json_encode(['error' => 'Нет данных для расчёта']);
+    $parsed = parse_url($db_url);
+    if ($parsed === false) {
+      die("Ошибка: не удалось разобрать DATABASE_URL\n");
+    }
+
+    $scheme = $parsed['scheme']; // postgres
+    $host   = $parsed['host'] ?? 'localhost';
+    $port   = $parsed['port'] ?? 5432;
+    $user   = $parsed['user'] ?? null;
+    $pass   = $parsed['pass'] ?? null;
+    $dbname = ltrim($parsed['path'], '/'); // /dbname → dbname
+
+    $db = new PDO(
+        "$scheme:host=$host;port=$port;dbname=$dbname",
+        $user,
+        $pass,
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]
+    );
+
+    // Проверяем наличие таблицы orders
+    if (!dbHasTables($db, ['orders'])) {
+        echo json_encode(['error' => 'Таблица orders не найдена']);
         exit;
     }
 
-    // Находим минимальное и максимальное время
-    $min_time = min($timestamps);
-    $max_time = max($timestamps);
+    $sql = '
+        SELECT 
+    MIN(created_at) as "Время начала", 
+    MAX(created_at) as "Время окончания", 
+    COUNT(*) as "Записей", 
+    SUM(quantity) as "Товаров", 
+    name as "Категория"
+    FROM (
+    SELECT 
+        o.created_at, 
+        o.quantity, 
+        c.name
+    FROM orders o
+    INNER JOIN products p ON o.product_id = p.id
+    INNER JOIN categories c ON p.category_id = c.id
+    WHERE o.created_at IS NOT NULL
+    ORDER BY o.created_at DESC
+    LIMIT 100
+    ) t
+    GROUP BY name
+    ORDER BY name;
+    ';
 
-    echo json_encode([
-        'min_purchase' => date('Y-m-d H:i:s', $min_time),
-        'max_purchase' => date('Y-m-d H:i:s', $max_time),
-        'total_orders' => count($timestamps)
-    ]);
+    $stmt = $db->query($sql);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    header('Content-Type: application/json');
+    echo json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
 } catch (PDOException $e) {
-    echo json_encode(['error' => 'Ошибка подключения к БД: ' . $e->getMessage()]);
-    exit;
+    echo json_encode(['error' => $e->getMessage()]);
 }
