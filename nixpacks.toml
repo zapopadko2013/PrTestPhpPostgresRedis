@@ -1,0 +1,5 @@
+[build]
+name = "php-web-app"
+
+[environment]
+php-extensions = ["pdo", "pdo_pgsql"]
