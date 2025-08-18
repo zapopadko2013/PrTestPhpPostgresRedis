@@ -1,13 +1,11 @@
 FROM php:8.2-fpm
 
-# Устанавливаем зависимости Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-COPY . /var/www/html
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    unzip \
+    && docker-php-ext-install pdo pdo_pgsql
+
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
 WORKDIR /var/www/html
-RUN composer install --no-dev
-
-# Открываем порт для PHP-FPM
-EXPOSE 9000
-
-# Указываем команду запуска
-CMD ["php-fpm"]
