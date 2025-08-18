@@ -40,7 +40,7 @@ $random_pr = random_int(1, 5);
 $random_count = random_int(1, 20);
 
 // --- 3. Настройка и подключение к PostgreSQL ---
-$db_url = getenv('DATABASE_URL') ?: 'postgresql://postgres:ZFdzFouKdUYjnnPCbvCFyxtyZxnNtEcQ@postgres.railway.internal:5432/railway';
+$db_url = getenv('DATABASE_URL') ?: 'pgsql://postgres:ZFdzFouKdUYjnnPCbvCFyxtyZxnNtEcQ@postgres.railway.internal:5432/railway';
 
 if (empty($db_url)) {
     http_response_code(500);

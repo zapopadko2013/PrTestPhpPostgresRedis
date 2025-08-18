@@ -5,7 +5,7 @@ require __DIR__ . '/db_utils.php';
 
 try {
 
-    $db_url = getenv('DATABASE_URL') ?: 'postgresql://postgres:ZFdzFouKdUYjnnPCbvCFyxtyZxnNtEcQ@postgres.railway.internal:5432/railway';
+    $db_url = getenv('DATABASE_URL') ?: 'pgsql://postgres:ZFdzFouKdUYjnnPCbvCFyxtyZxnNtEcQ@postgres.railway.internal:5432/railway';
     if ($db_url === false) {
         die("Ошибка: переменная окружения DATABASE_URL не найдена\n");
     }

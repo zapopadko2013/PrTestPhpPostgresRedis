@@ -1,6 +1,6 @@
 <?php
 
-$databaseUrl = getenv('DATABASE_URL') ?: 'postgresql://postgres:ZFdzFouKdUYjnnPCbvCFyxtyZxnNtEcQ@postgres.railway.internal:5432/railway';
+$databaseUrl = getenv('DATABASE_URL') ?: 'pgsql://postgres:ZFdzFouKdUYjnnPCbvCFyxtyZxnNtEcQ@postgres.railway.internal:5432/railway';
 $redisUrl = getenv('REDIS_URL') ?: 'redis://default:VpmXkCxeLayffLqOYkxKJQzvSJRjlEjR@shinkansen.proxy.rlwy.net:23157';;
 
 // Добавляем проверки на существование переменных
