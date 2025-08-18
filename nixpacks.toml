@@ -1,3 +1,5 @@
-[phases.setup]
-  aptPkgs = ['...', 'libpq-dev']
-  phpExtensions = ['pdo_pgsql']
+[build]
+name = "php-web-app"
+
+[environment]
+php-extensions = ["pdo", "pdo_pgsql"]
