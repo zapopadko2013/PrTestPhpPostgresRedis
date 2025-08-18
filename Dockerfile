@@ -1,12 +1,11 @@
 FROM php:8.2-fpm
 
-# Устанавливаем необходимые зависимости и расширение pdo_pgsql
 RUN apt-get update && apt-get install -y \
     libpq-dev \
-    && rm -rf /var/lib/apt/lists/* \
+    unzip \
     && docker-php-ext-install pdo pdo_pgsql
 
-# Остальная часть вашего Dockerfile
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
 WORKDIR /var/www/html
-COPY . .
-CMD ["php-fpm"]
