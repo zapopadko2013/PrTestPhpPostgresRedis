@@ -1,17 +1,12 @@
-FROM php:8.2-apache
+FROM php:8.2-fpm
 
-# Устанавливаем необходимые зависимости
+# Устанавливаем зависимости и расширение pdo_pgsql
 RUN apt-get update && apt-get install -y \
     libpq-dev \
-    && rm -rf /var/lib/apt/lists/* \
-    && docker-php-ext-install pdo pdo_pgsql
+    && docker-php-ext-install pdo_pgsql
 
-# Копируем пользовательский файл конфигурации Apache
-COPY apache2.conf /etc/apache2/apache2.conf
+# Копируем код приложения
+COPY . /var/www/html
 
-# Копируем файлы проекта
-COPY . /var/www/html/
-
-EXPOSE 80
-
-CMD ["apache2-foreground"]
+# Устанавливаем права (если нужно)
+RUN chown -R www-data:www-data /var/www/html
