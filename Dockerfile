@@ -7,7 +7,7 @@ WORKDIR /var/www/html
 RUN composer install --no-dev
 
 # Открываем порт для PHP-FPM
-EXPOSE 8000
+EXPOSE 9000
 
 # Указываем команду запуска
 CMD ["php-fpm"]
