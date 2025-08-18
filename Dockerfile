@@ -1,11 +1,17 @@
 FROM php:8.2-apache
 
+# Устанавливаем необходимые зависимости
 RUN apt-get update && apt-get install -y \
     libpq-dev \
-    unzip \
+    && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-install pdo pdo_pgsql
 
-RUN pecl install redis \
-    && docker-php-ext-enable redis
+# Копируем пользовательский файл конфигурации Apache
+COPY apache2.conf /etc/apache2/apache2.conf
 
-WORKDIR /var/www/html
+# Копируем файлы проекта
+COPY . /var/www/html/
+
+EXPOSE 80
+
+CMD ["apache2-foreground"]
